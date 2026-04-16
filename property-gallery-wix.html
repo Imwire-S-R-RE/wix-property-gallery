@@ -1,0 +1,2992 @@
+<!--
+================================================================================
+ IMWIRE PROPERTY GALLERY - Wix Embed (Bilingual EN/FR)
+================================================================================
+
+ HOW TO USE:
+ 1. This file is ready to paste into a Wix "Embed HTML" widget.
+    All 17 property images are hosted on Wix Media Manager (static.wixstatic.com)
+    and referenced by absolute URLs - no Wix Media upload step required.
+ 2. In the Wix Editor: Add -> Embed Code -> Embed HTML -> "Enter Code" ->
+    paste the entire contents of this file -> Update -> Publish.
+ 3. Make the widget full-width and 3000+ px tall; the HTML posts setHeight
+    messages to the parent frame so the iframe resizes dynamically.
+ 4. To add or replace photos later, upload them in Wix Media Manager,
+    copy their static.wixstatic.com URL, and paste into the admin panel
+    (?admin=1) image URLs field for that property.
+
+ BILINGUAL:
+ - Language toggle (EN / FR) in top-right of header
+ - URL param: ?lang=fr
+ - Stored in localStorage.imwire_lang
+
+ ADMIN ACCESS:
+ - Add ?admin=1 to the URL, OR press Ctrl+Shift+A (Cmd+Shift+A on Mac)
+ - Default password: imwire2026
+ - Change via: Admin Panel -> Settings -> Change Password
+
+ DATA BACKUP:
+ - Admin panel -> Settings -> "Export Properties as JSON"
+ - Data stored in localStorage (device-specific)
+ - Import on another device to sync
+================================================================================
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>IMWIRE - Our Properties</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --white: #f8f7f4;
+    --white-dim: #d5d4d1;
+    --gray: #888;
+    --gray-dark: #1a1a1a;
+    --accent: #b8a080;
+    --accent-dim: rgba(184,160,128,.15);
+    --accent-strong: rgba(184,160,128,.5);
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    --ease: cubic-bezier(.16,1,.3,1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--sans);
+    font-weight: 300;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  button {
+    font-family: inherit;
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  input, select, textarea {
+    font-family: inherit;
+    color: inherit;
+  }
+
+  /* ============ HEADER ============ */
+  .header {
+    position: relative;
+    padding: 60px 24px 40px;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .header .label {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+  .header h1 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    line-height: 1.05;
+    margin-bottom: 20px;
+    letter-spacing: -0.01em;
+  }
+  .header h1 em {
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .header .subtitle {
+    font-size: 15px;
+    color: var(--white-dim);
+    max-width: 640px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* ============ LANGUAGE TOGGLE ============ */
+  .lang-toggle {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    display: inline-flex;
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 40px;
+    overflow: hidden;
+    background: rgba(10,10,10,.4);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  .lang-toggle button {
+    padding: 8px 18px;
+    background: transparent;
+    color: var(--white-dim);
+    font-size: .72rem;
+    font-weight: 500;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+    transition: all .3s var(--ease);
+  }
+  .lang-toggle button.active {
+    background: var(--accent);
+    color: var(--black);
+  }
+  .lang-toggle button:not(.active):hover {
+    color: var(--white);
+  }
+  @media (max-width: 600px) {
+    .lang-toggle { top: 14px; right: 14px; }
+    .lang-toggle button { padding: 6px 14px; font-size: .68rem; }
+  }
+
+  /* ============ FILTER BAR ============ */
+  .filter-bar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(10,10,10,.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    padding: 16px 20px;
+    margin-bottom: 30px;
+  }
+  .filter-row {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+  }
+  .chip-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+  .chip {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--white-dim);
+    border: 1px solid rgba(255,255,255,.14);
+    transition: all 0.3s var(--ease);
+    white-space: nowrap;
+  }
+  .chip:hover {
+    border-color: var(--accent);
+    color: var(--white);
+  }
+  .chip.active {
+    background: var(--accent);
+    color: var(--black);
+    border-color: var(--accent);
+  }
+  .filter-select, .filter-search {
+    background: var(--gray-dark);
+    border: 1px solid rgba(255,255,255,.14);
+    color: var(--white);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 400;
+    outline: none;
+    transition: border-color 0.3s var(--ease);
+    min-height: 38px;
+  }
+  .filter-select:focus, .filter-search:focus {
+    border-color: var(--accent);
+  }
+  .filter-select {
+    cursor: pointer;
+    padding-right: 30px;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23b8a080' d='M5 6L0 0h10z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+  }
+  .filter-search {
+    flex: 1 1 220px;
+    min-width: 180px;
+  }
+  .filter-search::placeholder { color: var(--gray); }
+
+  /* ============ COUNT ============ */
+  .count {
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin: 0 0 28px;
+  }
+  .count strong { color: var(--accent); font-weight: 500; }
+
+  /* ============ GRID ============ */
+  .grid {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 500px;
+  }
+  @media (max-width: 960px) {
+    .grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  }
+  @media (max-width: 600px) {
+    .grid { grid-template-columns: 1fr; gap: 22px; padding: 0 18px; }
+    .header { padding: 60px 20px 30px; }
+    .filter-bar { padding: 14px 14px; }
+  }
+
+  /* ============ CARD ============ */
+  .card {
+    background: var(--gray-dark);
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.5s var(--ease), border-color 0.5s var(--ease), box-shadow 0.5s var(--ease);
+    opacity: 0;
+    transform: translateY(20px);
+    display: flex;
+    flex-direction: column;
+  }
+  .card.reveal {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .card:hover {
+    transform: translateY(-6px);
+    border-color: var(--accent-strong);
+    box-shadow: 0 20px 50px rgba(0,0,0,.5);
+  }
+  .card:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .card-image {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    background: var(--black);
+  }
+  .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s var(--ease);
+    display: block;
+  }
+  .card:hover .card-image img {
+    transform: scale(1.05);
+  }
+  .card-gradient {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  .card-gradient::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,.45) 100%);
+  }
+
+  /* Status badge */
+  .badge {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 3;
+  }
+  .badge.for-rent { background: rgba(184,160,128,.9); color: var(--black); }
+  .badge.for-sale { background: rgba(184,160,128,.9); color: var(--black); }
+  .badge.off-market { background: rgba(10,10,10,.85); color: var(--accent); border: 1px solid var(--accent); }
+  .badge.sold { background: rgba(180,50,50,.9); color: #fff; }
+  .badge.rented { background: rgba(120,100,80,.9); color: #fff; }
+
+  .gallery-count {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    background: rgba(10,10,10,.75);
+    color: var(--white);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .gallery-count svg { width: 12px; height: 12px; }
+
+  /* Off-market overlay */
+  .card.is-off-market .card-image img,
+  .card.is-off-market .card-gradient {
+    filter: blur(4px) brightness(0.55);
+    transition: filter 0.5s var(--ease);
+  }
+  .card.is-off-market:hover .card-image img,
+  .card.is-off-market:hover .card-gradient {
+    filter: blur(2px) brightness(0.7);
+  }
+  .private-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .private-overlay span {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.3rem;
+    color: var(--white);
+    letter-spacing: 0.05em;
+    opacity: 0.9;
+    text-shadow: 0 2px 8px rgba(0,0,0,.6);
+  }
+
+  /* Sold / Rented stamp */
+  .card.is-sold .card-image img,
+  .card.is-rented .card-image img {
+    filter: grayscale(1) brightness(0.7);
+  }
+  .stamp {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-12deg);
+    padding: 10px 30px;
+    border: 3px solid;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    z-index: 3;
+    pointer-events: none;
+    background: rgba(10,10,10,.5);
+    backdrop-filter: blur(2px);
+  }
+  .stamp.sold { color: #ff6b6b; border-color: #ff6b6b; }
+  .stamp.rented { color: #d4b88e; border-color: #d4b88e; }
+
+  /* Card body */
+  .card-body {
+    padding: 22px 22px 24px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .card-title {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    font-weight: 500;
+    line-height: 1.25;
+    margin-bottom: 6px;
+    color: var(--white);
+  }
+  .card-location {
+    font-size: 12px;
+    color: var(--gray);
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 14px;
+  }
+  .card-location svg { width: 12px; height: 12px; flex-shrink: 0; color: var(--accent); }
+
+  .card-specs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .spec {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 3px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid rgba(184,160,128,.25);
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--white-dim);
+    line-height: 1.6;
+    margin-bottom: 18px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex: 1;
+  }
+
+  .card-price {
+    font-family: var(--serif);
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.01em;
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255,255,255,.08);
+  }
+  .card-price .unit {
+    font-size: 0.7em;
+    color: var(--gray);
+    margin-left: 4px;
+    font-weight: 400;
+  }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 80px 24px;
+    color: var(--gray);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  .empty-state h3 {
+    font-family: var(--serif);
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: var(--white-dim);
+    margin-bottom: 10px;
+  }
+  .empty-state p { font-size: 14px; }
+
+  /* ============ CONTACT CTA ============ */
+  .cta {
+    max-width: 900px;
+    margin: 70px auto 60px;
+    padding: 50px 30px;
+    text-align: center;
+    border: 1px solid rgba(184,160,128,.2);
+    border-radius: 4px;
+    background: linear-gradient(135deg, rgba(184,160,128,.04), rgba(184,160,128,.01));
+  }
+  @media (max-width: 600px) {
+    .cta { margin: 50px 18px; padding: 40px 24px; }
+  }
+  .cta h2 {
+    font-family: var(--serif);
+    font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+    font-weight: 400;
+    margin-bottom: 14px;
+    color: var(--white);
+  }
+  .cta h2 em { color: var(--accent); font-style: italic; font-weight: 500; }
+  .cta p {
+    color: var(--white-dim);
+    font-size: 15px;
+    margin-bottom: 26px;
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .btn-primary {
+    display: inline-block;
+    padding: 14px 36px;
+    background: var(--accent);
+    color: var(--black);
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border-radius: 2px;
+    text-decoration: none;
+    transition: all 0.4s var(--ease);
+  }
+  .btn-primary:hover {
+    background: var(--white);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(184,160,128,.25);
+  }
+
+  /* ============ LIGHTBOX ============ */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.96);
+    z-index: 1000;
+    display: none;
+    flex-direction: column;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .lightbox.active {
+    display: flex;
+    opacity: 1;
+  }
+  .lightbox-header {
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--white);
+  }
+  .lightbox-title {
+    font-family: var(--serif);
+    font-size: 1.3rem;
+    font-weight: 500;
+  }
+  .lightbox-counter {
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+  }
+  .lightbox-close {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.06);
+    color: var(--white);
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease;
+  }
+  .lightbox-close:hover { background: rgba(255,255,255,.15); }
+
+  .lightbox-stage {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 0 70px;
+    overflow: hidden;
+    touch-action: pan-y;
+  }
+  .lightbox-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transform: scale(0.95);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  .lightbox-image.loaded {
+    transform: scale(1);
+    opacity: 1;
+  }
+  .lightbox-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.08);
+    color: var(--white);
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease;
+    z-index: 2;
+  }
+  .lightbox-arrow:hover { background: var(--accent); color: var(--black); }
+  .lightbox-arrow.prev { left: 16px; }
+  .lightbox-arrow.next { right: 16px; }
+
+  .lightbox-thumbs {
+    display: flex;
+    gap: 8px;
+    padding: 20px;
+    overflow-x: auto;
+    justify-content: center;
+    scrollbar-width: thin;
+  }
+  .lightbox-thumbs::-webkit-scrollbar { height: 6px; }
+  .lightbox-thumbs::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 3px; }
+  .lightbox-thumb {
+    width: 72px;
+    height: 52px;
+    flex-shrink: 0;
+    border-radius: 3px;
+    overflow: hidden;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.3s, transform 0.3s;
+    border: 2px solid transparent;
+  }
+  .lightbox-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .lightbox-thumb.active {
+    opacity: 1;
+    border-color: var(--accent);
+  }
+  .lightbox-thumb:hover { opacity: 0.85; }
+
+  @media (max-width: 600px) {
+    .lightbox-stage { padding: 0 10px; }
+    .lightbox-arrow { width: 40px; height: 40px; font-size: 18px; }
+    .lightbox-arrow.prev { left: 6px; }
+    .lightbox-arrow.next { right: 6px; }
+    .lightbox-title { font-size: 1rem; }
+    .lightbox-thumb { width: 60px; height: 44px; }
+  }
+
+  /* ============ ADMIN DRAWER ============ */
+  .admin-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 480px;
+    max-width: 100%;
+    background: var(--gray-dark);
+    border-left: 1px solid rgba(184,160,128,.2);
+    z-index: 900;
+    transform: translateX(100%);
+    transition: transform 0.3s var(--ease);
+    display: flex;
+    flex-direction: column;
+    box-shadow: -10px 0 40px rgba(0,0,0,.6);
+  }
+  .admin-drawer.active { transform: translateX(0); }
+
+  .admin-header {
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+  .admin-header h2 {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    font-weight: 500;
+  }
+  .admin-header h2 span { color: var(--accent); }
+  .admin-close {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: var(--white-dim);
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s;
+  }
+  .admin-close:hover { color: var(--accent); }
+
+  .admin-tabs {
+    display: flex;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+  .admin-tab {
+    flex: 1;
+    padding: 14px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gray);
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s;
+  }
+  .admin-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  .admin-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 24px;
+  }
+
+  .admin-add-btn {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 16px;
+    background: var(--accent);
+    color: var(--black);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border-radius: 3px;
+    transition: all 0.3s;
+  }
+  .admin-add-btn:hover {
+    background: var(--white);
+    transform: translateY(-1px);
+  }
+
+  .admin-prop-row {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    margin-bottom: 10px;
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 3px;
+    align-items: center;
+  }
+  .admin-prop-thumb {
+    width: 50px;
+    height: 50px;
+    background: var(--black);
+    border-radius: 3px;
+    flex-shrink: 0;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid rgba(184,160,128,.2);
+  }
+  .admin-prop-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .admin-prop-title {
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--white);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .admin-prop-status {
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+  .admin-prop-actions {
+    display: flex;
+    gap: 6px;
+  }
+  .admin-prop-actions button {
+    padding: 6px 10px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 3px;
+    transition: all 0.3s;
+  }
+  .admin-edit-btn {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+  .admin-edit-btn:hover { background: var(--accent); color: var(--black); }
+  .admin-delete-btn {
+    background: transparent;
+    color: #ff6b6b;
+    border: 1px solid rgba(255,107,107,.4);
+  }
+  .admin-delete-btn:hover {
+    background: rgba(255,107,107,.15);
+    border-color: #ff6b6b;
+  }
+
+  /* Settings */
+  .settings-group {
+    margin-bottom: 28px;
+  }
+  .settings-group h3 {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .settings-group p {
+    font-size: 12px;
+    color: var(--gray);
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+  .settings-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 3px;
+    border: 1px solid rgba(184,160,128,.3);
+    background: transparent;
+    color: var(--accent);
+    margin-bottom: 8px;
+    transition: all 0.3s;
+  }
+  .settings-btn:hover {
+    background: var(--accent);
+    color: var(--black);
+  }
+  .settings-btn.danger {
+    color: #ff6b6b;
+    border-color: rgba(255,107,107,.4);
+  }
+  .settings-btn.danger:hover {
+    background: rgba(255,107,107,.15);
+    border-color: #ff6b6b;
+    color: #ff6b6b;
+  }
+  .settings-input {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--black);
+    border: 1px solid rgba(255,255,255,.12);
+    color: var(--white);
+    border-radius: 3px;
+    font-size: 13px;
+    margin-bottom: 10px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  .settings-input:focus { border-color: var(--accent); }
+
+  /* ============ FORM MODAL ============ */
+  .form-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.92);
+    z-index: 1100;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    overflow-y: auto;
+    padding: 20px;
+  }
+  .form-modal.active {
+    display: flex;
+  }
+  .form-content {
+    background: var(--gray-dark);
+    border: 1px solid rgba(184,160,128,.25);
+    border-radius: 4px;
+    max-width: 720px;
+    width: 100%;
+    padding: 28px;
+    margin: 20px auto;
+  }
+  .form-content h3 {
+    font-family: var(--serif);
+    font-size: 1.6rem;
+    font-weight: 500;
+    margin-bottom: 20px;
+    color: var(--white);
+  }
+  .form-content h3 span { color: var(--accent); font-style: italic; }
+
+  .form-group {
+    margin-bottom: 14px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 5px;
+  }
+  .form-group .hint {
+    display: block;
+    font-size: 11px;
+    color: var(--gray);
+    margin-top: 4px;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 300;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--black);
+    border: 1px solid rgba(255,255,255,.12);
+    color: var(--white);
+    border-radius: 3px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--accent);
+  }
+  .form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+    font-family: var(--sans);
+    line-height: 1.5;
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+  .form-section-divider {
+    margin: 22px 0 14px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255,255,255,.08);
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-style: italic;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+  }
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,.08);
+  }
+  .form-actions button {
+    padding: 12px 24px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border-radius: 3px;
+    transition: all 0.3s;
+  }
+  .form-cancel {
+    background: transparent;
+    color: var(--white-dim);
+    border: 1px solid rgba(255,255,255,.15);
+  }
+  .form-cancel:hover { border-color: var(--white); color: var(--white); }
+  .form-save {
+    background: var(--accent);
+    color: var(--black);
+  }
+  .form-save:hover { background: var(--white); }
+
+  /* ============ ADMIN CHIP (bottom-left, discrete) ============ */
+  .admin-chip {
+    position: fixed;
+    bottom: 18px;
+    left: 18px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(10,10,10,.55);
+    border: 1px solid rgba(255,255,255,.08);
+    color: rgba(255,255,255,.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1050;
+    opacity: .55;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: opacity 0.3s var(--ease), border-color 0.3s, color 0.3s, background 0.3s, transform 0.3s var(--ease);
+  }
+  .admin-chip:hover {
+    opacity: 1;
+    border-color: rgba(184,160,128,.4);
+    color: var(--accent);
+    transform: scale(1.05);
+  }
+  .admin-chip:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    opacity: 1;
+  }
+  .admin-chip svg {
+    width: 14px;
+    height: 14px;
+    stroke-width: 1.6;
+  }
+  .admin-chip.authed {
+    border-color: rgba(184,160,128,.5);
+    color: var(--accent);
+    opacity: .75;
+  }
+  .admin-chip.authed::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #7bc47f;
+    box-shadow: 0 0 0 2px rgba(10,10,10,.8);
+  }
+  .admin-chip-tip {
+    position: absolute;
+    left: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--gray-dark);
+    color: var(--white-dim);
+    padding: 6px 10px;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    border-radius: 3px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s var(--ease);
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  .admin-chip:hover .admin-chip-tip,
+  .admin-chip:focus-visible .admin-chip-tip { opacity: 1; }
+
+  /* ============ LOGIN MODAL ============ */
+  .login-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.88);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 1150;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .login-modal.active { display: flex; }
+  .login-content {
+    background: var(--gray-dark);
+    border: 1px solid rgba(184,160,128,.3);
+    border-radius: 4px;
+    max-width: 360px;
+    width: 100%;
+    padding: 32px 28px 26px;
+    position: relative;
+    animation: loginIn 0.35s var(--ease);
+  }
+  @keyframes loginIn {
+    from { opacity: 0; transform: translateY(8px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .login-content h3 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 4px;
+    color: var(--white);
+  }
+  .login-content h3 span { color: var(--accent); font-style: italic; }
+  .login-sub {
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 22px;
+  }
+  .login-field {
+    margin-bottom: 12px;
+  }
+  .login-field label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 5px;
+  }
+  .login-field input {
+    width: 100%;
+    padding: 11px 12px;
+    background: var(--black);
+    border: 1px solid rgba(255,255,255,.12);
+    color: var(--white);
+    border-radius: 3px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  .login-field input:focus { border-color: var(--accent); }
+  .login-error {
+    color: #ff8b8b;
+    font-size: 11px;
+    text-align: center;
+    min-height: 14px;
+    margin: 6px 0 4px;
+    letter-spacing: 0.03em;
+  }
+  .login-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .login-actions button {
+    flex: 1;
+    padding: 11px 14px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    border-radius: 3px;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  .login-cancel {
+    background: transparent;
+    color: var(--white-dim);
+    border: 1px solid rgba(255,255,255,.15);
+  }
+  .login-cancel:hover { border-color: var(--white); color: var(--white); }
+  .login-submit {
+    background: var(--accent);
+    color: var(--black);
+    border: 1px solid var(--accent);
+  }
+  .login-submit:hover { background: var(--white); border-color: var(--white); }
+
+  /* Admin drawer logout link in header */
+  .admin-header-logout {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,.12);
+    color: var(--white-dim);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 6px 10px;
+    border-radius: 3px;
+    margin-right: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .admin-header-logout:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .admin-header .admin-header-actions {
+    display: flex;
+    align-items: center;
+  }
+  .settings-current-user {
+    font-size: 11px;
+    color: var(--white-dim);
+    margin-bottom: 10px;
+    letter-spacing: 0.04em;
+  }
+  .settings-current-user strong { color: var(--accent); font-weight: 500; }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+    .card { opacity: 1; transform: none; }
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--gray-dark);
+    border: 1px solid var(--accent);
+    color: var(--white);
+    padding: 12px 24px;
+    border-radius: 3px;
+    font-size: 13px;
+    z-index: 1200;
+    opacity: 0;
+    transition: all 0.3s var(--ease);
+    max-width: 90%;
+    text-align: center;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="header">
+  <div class="lang-toggle" role="group" aria-label="Language">
+    <button type="button" data-lang="en" class="active">EN</button>
+    <button type="button" data-lang="fr">FR</button>
+  </div>
+  <div class="label" id="headerLabel"></div>
+  <h1 id="headerTitle"></h1>
+  <p class="subtitle" id="headerSubtitle"></p>
+</header>
+
+<!-- ============ FILTER BAR ============ -->
+<div class="filter-bar" role="region" aria-label="Property filters">
+  <div class="filter-row">
+    <div class="chip-group" id="statusChips" role="tablist" aria-label="Filter by status">
+      <button class="chip active" data-status="all" data-i18n="filter_all" aria-pressed="true"></button>
+      <button class="chip" data-status="for-rent" data-i18n="filter_for_rent" aria-pressed="false"></button>
+      <button class="chip" data-status="for-sale" data-i18n="filter_for_sale" aria-pressed="false"></button>
+      <button class="chip" data-status="off-market" data-i18n="filter_off_market" aria-pressed="false"></button>
+      <button class="chip" data-status="sold" data-i18n="filter_sold" aria-pressed="false"></button>
+      <button class="chip" data-status="rented" data-i18n="filter_rented" aria-pressed="false"></button>
+    </div>
+    <select class="filter-select" id="typeFilter" aria-label="Filter by property type">
+      <option value="all" data-i18n="all_types"></option>
+      <option value="apartment" data-i18n="type_apartment"></option>
+      <option value="villa" data-i18n="type_villa"></option>
+      <option value="commercial" data-i18n="type_commercial"></option>
+    </select>
+    <select class="filter-select" id="roomsFilter" aria-label="Filter by rooms">
+      <option value="all" data-i18n="all_rooms"></option>
+      <option value="1" data-i18n="room_1"></option>
+      <option value="2" data-i18n="room_2"></option>
+      <option value="3" data-i18n="room_3"></option>
+      <option value="4" data-i18n="room_4"></option>
+      <option value="5" data-i18n="room_5plus"></option>
+    </select>
+    <input type="search" class="filter-search" id="searchInput" aria-label="Search properties" />
+  </div>
+</div>
+
+<!-- ============ COUNT ============ -->
+<div class="count" id="countEl"><strong id="countNum">0</strong> <span id="countLabel"></span></div>
+
+<!-- ============ GRID ============ -->
+<main class="grid" id="grid" aria-live="polite"></main>
+
+<!-- ============ CTA ============ -->
+<section class="cta">
+  <h2 id="ctaTitle"></h2>
+  <p id="ctaText"></p>
+  <a href="mailto:contact@imwire.ch" class="btn-primary" id="contactBtn"></a>
+</section>
+
+<!-- ============ LIGHTBOX ============ -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Property image gallery">
+  <div class="lightbox-header">
+    <div>
+      <div class="lightbox-title" id="lbTitle"></div>
+      <div class="lightbox-counter" id="lbCounter"></div>
+    </div>
+    <button class="lightbox-close" id="lbClose" aria-label="Close gallery">&times;</button>
+  </div>
+  <div class="lightbox-stage" id="lbStage">
+    <button class="lightbox-arrow prev" id="lbPrev" aria-label="Previous image">&#8249;</button>
+    <img class="lightbox-image" id="lbImage" alt="" />
+    <button class="lightbox-arrow next" id="lbNext" aria-label="Next image">&#8250;</button>
+  </div>
+  <div class="lightbox-thumbs" id="lbThumbs"></div>
+</div>
+
+<!-- ============ ADMIN CHIP (bottom-left, discrete) ============ -->
+<button type="button" class="admin-chip" id="adminChip" aria-label="Admin" title="">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <rect x="4" y="10" width="16" height="10" rx="1.5"></rect>
+    <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+  </svg>
+  <span class="admin-chip-tip" id="adminChipTip"></span>
+</button>
+
+<!-- ============ LOGIN MODAL ============ -->
+<div class="login-modal" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="loginTitle" aria-hidden="true">
+  <div class="login-content">
+    <h3 id="loginTitle"></h3>
+    <div class="login-sub" id="loginSub"></div>
+    <form id="loginForm" autocomplete="on">
+      <div class="login-field">
+        <label for="loginUser" id="loginUserLabel"></label>
+        <input type="text" id="loginUser" autocomplete="username" required />
+      </div>
+      <div class="login-field">
+        <label for="loginPass" id="loginPassLabel"></label>
+        <input type="password" id="loginPass" autocomplete="current-password" required />
+      </div>
+      <div class="login-error" id="loginError" aria-live="polite"></div>
+      <div class="login-actions">
+        <button type="button" class="login-cancel" id="loginCancel" data-i18n="btn_cancel"></button>
+        <button type="submit" class="login-submit" id="loginSubmit" data-i18n="admin_login"></button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ ADMIN DRAWER ============ -->
+<aside class="admin-drawer" id="adminDrawer" role="dialog" aria-modal="true" aria-label="Admin Panel" aria-hidden="true">
+  <div class="admin-header">
+    <h2 id="adminHeaderTitle"></h2>
+    <div class="admin-header-actions">
+      <button class="admin-header-logout" id="adminLogoutBtn" data-i18n="admin_logout"></button>
+      <button class="admin-close" id="adminClose" aria-label="Close admin panel">&times;</button>
+    </div>
+  </div>
+  <div class="admin-tabs" role="tablist">
+    <button class="admin-tab active" data-tab="properties" data-i18n="tab_properties" role="tab" aria-selected="true"></button>
+    <button class="admin-tab" data-tab="settings" data-i18n="tab_settings" role="tab" aria-selected="false"></button>
+  </div>
+  <div class="admin-body">
+    <div id="adminPropertiesTab">
+      <button class="admin-add-btn" id="addPropertyBtn" data-i18n="btn_add_property"></button>
+      <div id="adminPropList"></div>
+    </div>
+    <div id="adminSettingsTab" style="display:none;">
+      <div class="settings-group">
+        <h3 id="settingsBackupTitle">Backup &amp; Restore</h3>
+        <p id="settingsInfoP"></p>
+        <button class="settings-btn" id="exportBtn" data-i18n="settings_export"></button>
+        <button class="settings-btn" id="importBtn" data-i18n="settings_import"></button>
+        <input type="file" id="importFile" accept="application/json" style="display:none;" />
+      </div>
+      <div class="settings-group">
+        <h3 id="settingsSecurityTitle">Security</h3>
+        <p id="settingsSecurityInfo"></p>
+        <div class="settings-current-user"><span data-i18n="settings_current_user"></span>: <strong id="currentUserEl"></strong></div>
+        <input type="text" class="settings-input" id="newUsername" autocomplete="username" />
+        <button class="settings-btn" id="changeUserBtn" data-i18n="settings_change_username"></button>
+        <input type="password" class="settings-input" id="newPassword" autocomplete="new-password" style="margin-top:14px;" />
+        <button class="settings-btn" id="changePassBtn" data-i18n="settings_change_password"></button>
+      </div>
+      <div class="settings-group">
+        <h3 id="settingsDangerTitle">Danger Zone</h3>
+        <button class="settings-btn danger" id="resetBtn" data-i18n="settings_reset"></button>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ============ FORM MODAL ============ -->
+<div class="form-modal" id="formModal" role="dialog" aria-modal="true" aria-labelledby="formTitle" aria-hidden="true">
+  <div class="form-content">
+    <h3 id="formTitle"></h3>
+    <form id="propForm" novalidate>
+      <input type="hidden" id="fieldId" />
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fieldStatus" data-i18n="form_status"></label>
+          <select id="fieldStatus" required>
+            <option value="for-rent" data-i18n="badge_for_rent"></option>
+            <option value="for-sale" data-i18n="badge_for_sale"></option>
+            <option value="off-market" data-i18n="badge_off_market"></option>
+            <option value="sold" data-i18n="badge_sold"></option>
+            <option value="rented" data-i18n="badge_rented"></option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="fieldType" data-i18n="form_type"></label>
+          <select id="fieldType" required>
+            <option value="apartment" data-i18n="type_apartment"></option>
+            <option value="villa" data-i18n="type_villa"></option>
+            <option value="commercial" data-i18n="type_commercial"></option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fieldTitleEn" data-i18n="form_title_en"></label>
+          <input type="text" id="fieldTitleEn" required />
+        </div>
+        <div class="form-group">
+          <label for="fieldTitleFr" data-i18n="form_title_fr"></label>
+          <input type="text" id="fieldTitleFr" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fieldLocationEn" data-i18n="form_location_en"></label>
+          <input type="text" id="fieldLocationEn" />
+        </div>
+        <div class="form-group">
+          <label for="fieldLocationFr" data-i18n="form_location_fr"></label>
+          <input type="text" id="fieldLocationFr" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fieldRooms" data-i18n="form_rooms"></label>
+          <input type="number" id="fieldRooms" min="0" step="0.5" />
+        </div>
+        <div class="form-group">
+          <label for="fieldArea" data-i18n="form_area"></label>
+          <input type="number" id="fieldArea" min="0" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fieldPrice" data-i18n="form_price"></label>
+          <input type="number" id="fieldPrice" min="0" />
+        </div>
+        <div class="form-group">
+          <label for="fieldPriceUnit" data-i18n="form_price_unit"></label>
+          <input type="text" id="fieldPriceUnit" placeholder="/month" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fieldPriceLabelEn" data-i18n="form_price_label_en"></label>
+          <input type="text" id="fieldPriceLabelEn" />
+        </div>
+        <div class="form-group">
+          <label for="fieldPriceLabelFr" data-i18n="form_price_label_fr"></label>
+          <input type="text" id="fieldPriceLabelFr" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fieldSpecsEn" data-i18n="form_specs_en"></label>
+          <input type="text" id="fieldSpecsEn" placeholder="3 rooms, 70 m&sup2;, Furnished" />
+        </div>
+        <div class="form-group">
+          <label for="fieldSpecsFr" data-i18n="form_specs_fr"></label>
+          <input type="text" id="fieldSpecsFr" placeholder="3 pi&egrave;ces, 70 m&sup2;, Meubl&eacute;" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fieldDescEn" data-i18n="form_description_en"></label>
+          <textarea id="fieldDescEn" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="fieldDescFr" data-i18n="form_description_fr"></label>
+          <textarea id="fieldDescFr" rows="3"></textarea>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="fieldImages" data-i18n="form_images"></label>
+        <textarea id="fieldImages" rows="4" placeholder="https://static.wixstatic.com/media/..."></textarea>
+        <span class="hint" id="imagesHint"></span>
+      </div>
+      <div class="form-group">
+        <label for="fieldGradient" data-i18n="form_gradient"></label>
+        <input type="text" id="fieldGradient" placeholder="linear-gradient(135deg,#0a1628,#142440,#1e3a5c)" />
+      </div>
+      <div class="form-actions">
+        <button type="button" class="form-cancel" id="formCancel" data-i18n="btn_cancel"></button>
+        <button type="submit" class="form-save" data-i18n="btn_save"></button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* =====================================================================
+   IMWIRE PROPERTY GALLERY - JavaScript (Bilingual EN/FR)
+   ===================================================================== */
+
+// Prefix for all relative image paths.
+// Leave empty to use relative paths (works locally).
+// When deploying to Wix, either:
+//   a) Upload images to Wix Media Manager and replace URLs in the admin panel, OR
+//   b) Set this to a CDN base like "https://static.wixstatic.com/media/YOUR_SITE/"
+const IMAGE_BASE_URL = '';
+
+const ADMIN_PASSWORD = 'imwire2026'; // Default admin password
+const ADMIN_USERNAME = 'admin';      // Default admin username
+
+/* =====================================================================
+   I18N - All UI strings
+   ===================================================================== */
+const I18N = {
+  en: {
+    label: "Real Estate Agency \u00B7 Geneva & Vaud",
+    title_prefix: "Our",
+    title_highlight: "Properties",
+    subtitle: "Explore our curated selection of apartments, houses and villas available for sale, rent and off-market across Geneva and the canton of Vaud.",
+    filter_all: "All",
+    filter_for_rent: "For Rent",
+    filter_for_sale: "For Sale",
+    filter_off_market: "Off-Market",
+    filter_sold: "Sold",
+    filter_rented: "Rented",
+    all_types: "All Types",
+    type_apartment: "Apartment",
+    type_villa: "Villa / House",
+    type_commercial: "Commercial",
+    all_rooms: "All Rooms",
+    room_1: "1 Room",
+    room_2: "2 Rooms",
+    room_3: "3 Rooms",
+    room_4: "4 Rooms",
+    room_5plus: "5+ Rooms",
+    search_placeholder: "Search by name or location...",
+    count_one: "property found",
+    count_many: "properties found",
+    empty_state: "No properties match your criteria. Try adjusting your filters.",
+    private_viewing: "Private Viewing",
+    badge_for_rent: "For Rent",
+    badge_for_sale: "For Sale",
+    badge_off_market: "Off-Market",
+    badge_sold: "Sold",
+    badge_rented: "Rented",
+    cta_title_prefix: "Interested in a",
+    cta_title_highlight: "property",
+    cta_text: "Contact us for more details or to arrange a private viewing.",
+    cta_button: "Contact Us",
+    lightbox_close: "Close gallery",
+    lightbox_prev: "Previous image",
+    lightbox_next: "Next image",
+    admin_title: "Admin Panel",
+    admin_password_prompt: "Enter admin password",
+    admin_login: "Log in",
+    admin_logout: "Log out",
+    admin_chip_tip: "Admin",
+    login_title: "Admin Access",
+    login_sub: "IMWIRE Management",
+    login_user_label: "Username",
+    login_pass_label: "Password",
+    login_invalid: "Invalid username or password",
+    settings_current_user: "Current user",
+    settings_change_username: "Change Username",
+    settings_change_user_placeholder: "New username",
+    toast_user_changed: "Username updated",
+    user_too_short: "Username must be at least 2 characters",
+    toast_logout: "Logged out",
+    tab_properties: "Properties",
+    tab_settings: "Settings",
+    btn_add_property: "+ Add New Property",
+    btn_edit: "Edit",
+    btn_delete: "Delete",
+    btn_cancel: "Cancel",
+    btn_save: "Save",
+    confirm_delete: "Are you sure you want to delete this property?",
+    form_status: "Status",
+    form_type: "Type",
+    form_title_en: "Title (English)",
+    form_title_fr: "Title (French)",
+    form_location_en: "Location (English)",
+    form_location_fr: "Location (French)",
+    form_rooms: "Rooms",
+    form_area: "Area (m\u00B2)",
+    form_price: "Price (CHF)",
+    form_price_label_en: "Price label (English)",
+    form_price_label_fr: "Price label (French)",
+    form_price_unit: "Price unit (e.g. /month)",
+    form_specs_en: "Specs - English (comma-separated)",
+    form_specs_fr: "Specs - French (comma-separated)",
+    form_description_en: "Description (English)",
+    form_description_fr: "Description (French)",
+    form_images: "Image URLs (one per line)",
+    form_images_help: "Paste image URLs, one per line. Use full Wix Media URLs (https://static.wixstatic.com/media/...).",
+    form_gradient: "Fallback gradient (CSS, for off-market no-image cards)",
+    settings_backup: "Backup & Restore",
+    settings_security: "Security",
+    settings_danger: "Danger Zone",
+    settings_export: "Export Properties as JSON",
+    settings_import: "Import from JSON",
+    settings_reset: "Reset to Defaults",
+    settings_change_password: "Change Password",
+    settings_change_pw_placeholder: "New password",
+    settings_info: "Data is stored in your browser's localStorage. Export regularly to back up. Import on another device to sync.",
+    settings_security_info: "Change the admin panel password. The new password takes effect immediately.",
+    settings_danger_info: "Reset all properties to the default set. This cannot be undone.",
+    doc_title: "IMWIRE - Our Properties",
+    no_properties_found: "No properties found",
+    toast_saved: "Saved",
+    toast_deleted: "Property deleted",
+    toast_imported: "Imported successfully",
+    toast_exported: "Exported",
+    toast_pw_changed: "Password updated",
+    toast_reset: "Reset to defaults",
+    toast_wrong_pw: "Incorrect password",
+    toast_login: "Logged in",
+    edit_property: "Edit",
+    add_property: "Add",
+    property_word: "Property",
+    title_required: "Title is required",
+    pw_too_short: "Password must be at least 4 characters",
+    import_invalid: "Import failed: invalid JSON",
+    save_failed: "Failed to save - storage may be full"
+  },
+  fr: {
+    label: "Agence immobili\u00E8re \u00B7 Gen\u00E8ve & Vaud",
+    title_prefix: "Nos",
+    title_highlight: "Biens",
+    subtitle: "D\u00E9couvrez notre s\u00E9lection d'appartements, maisons et villas \u00E0 vendre, \u00E0 louer et en off-market \u00E0 Gen\u00E8ve et dans le canton de Vaud.",
+    filter_all: "Tous",
+    filter_for_rent: "\u00C0 louer",
+    filter_for_sale: "\u00C0 vendre",
+    filter_off_market: "Off-Market",
+    filter_sold: "Vendu",
+    filter_rented: "Lou\u00E9",
+    all_types: "Tous types",
+    type_apartment: "Appartement",
+    type_villa: "Villa / Maison",
+    type_commercial: "Commercial",
+    all_rooms: "Toutes pi\u00E8ces",
+    room_1: "1 pi\u00E8ce",
+    room_2: "2 pi\u00E8ces",
+    room_3: "3 pi\u00E8ces",
+    room_4: "4 pi\u00E8ces",
+    room_5plus: "5+ pi\u00E8ces",
+    search_placeholder: "Rechercher par nom ou lieu...",
+    count_one: "bien trouv\u00E9",
+    count_many: "biens trouv\u00E9s",
+    empty_state: "Aucun bien ne correspond \u00E0 vos crit\u00E8res. Ajustez vos filtres.",
+    private_viewing: "Visite priv\u00E9e",
+    badge_for_rent: "\u00C0 louer",
+    badge_for_sale: "\u00C0 vendre",
+    badge_off_market: "Off-Market",
+    badge_sold: "Vendu",
+    badge_rented: "Lou\u00E9",
+    cta_title_prefix: "Int\u00E9ress\u00E9 par un",
+    cta_title_highlight: "bien",
+    cta_text: "Contactez-nous pour plus de d\u00E9tails ou pour organiser une visite priv\u00E9e.",
+    cta_button: "Nous contacter",
+    lightbox_close: "Fermer la galerie",
+    lightbox_prev: "Image pr\u00E9c\u00E9dente",
+    lightbox_next: "Image suivante",
+    admin_title: "Panneau admin",
+    admin_password_prompt: "Entrez le mot de passe admin",
+    admin_login: "Se connecter",
+    admin_logout: "Se d\u00E9connecter",
+    admin_chip_tip: "Admin",
+    login_title: "Acc\u00E8s admin",
+    login_sub: "Gestion IMWIRE",
+    login_user_label: "Nom d'utilisateur",
+    login_pass_label: "Mot de passe",
+    login_invalid: "Nom d'utilisateur ou mot de passe incorrect",
+    settings_current_user: "Utilisateur actuel",
+    settings_change_username: "Changer le nom d'utilisateur",
+    settings_change_user_placeholder: "Nouveau nom d'utilisateur",
+    toast_user_changed: "Nom d'utilisateur mis \u00E0 jour",
+    user_too_short: "Le nom d'utilisateur doit contenir au moins 2 caract\u00E8res",
+    toast_logout: "D\u00E9connect\u00E9",
+    tab_properties: "Biens",
+    tab_settings: "Param\u00E8tres",
+    btn_add_property: "+ Ajouter un bien",
+    btn_edit: "Modifier",
+    btn_delete: "Supprimer",
+    btn_cancel: "Annuler",
+    btn_save: "Enregistrer",
+    confirm_delete: "\u00CAtes-vous s\u00FBr de vouloir supprimer ce bien ?",
+    form_status: "Statut",
+    form_type: "Type",
+    form_title_en: "Titre (anglais)",
+    form_title_fr: "Titre (fran\u00E7ais)",
+    form_location_en: "Lieu (anglais)",
+    form_location_fr: "Lieu (fran\u00E7ais)",
+    form_rooms: "Pi\u00E8ces",
+    form_area: "Surface (m\u00B2)",
+    form_price: "Prix (CHF)",
+    form_price_label_en: "Libell\u00E9 prix (anglais)",
+    form_price_label_fr: "Libell\u00E9 prix (fran\u00E7ais)",
+    form_price_unit: "Unit\u00E9 prix (ex. /mois)",
+    form_specs_en: "Caract\u00E9ristiques - anglais (s\u00E9par\u00E9es par virgules)",
+    form_specs_fr: "Caract\u00E9ristiques - fran\u00E7ais (s\u00E9par\u00E9es par virgules)",
+    form_description_en: "Description (anglais)",
+    form_description_fr: "Description (fran\u00E7ais)",
+    form_images: "URLs images (une par ligne)",
+    form_images_help: "Collez les URLs d'images, une par ligne. URLs Wix Media Manager (https://static.wixstatic.com/media/...).",
+    form_gradient: "D\u00E9grad\u00E9 de secours (CSS, pour cartes off-market sans image)",
+    settings_backup: "Sauvegarde & Restauration",
+    settings_security: "S\u00E9curit\u00E9",
+    settings_danger: "Zone dangereuse",
+    settings_export: "Exporter les biens en JSON",
+    settings_import: "Importer depuis JSON",
+    settings_reset: "R\u00E9initialiser aux valeurs par d\u00E9faut",
+    settings_change_password: "Changer le mot de passe",
+    settings_change_pw_placeholder: "Nouveau mot de passe",
+    settings_info: "Les donn\u00E9es sont stock\u00E9es dans le localStorage de votre navigateur. Exportez r\u00E9guli\u00E8rement pour sauvegarder. Importez sur un autre appareil pour synchroniser.",
+    settings_security_info: "Changez le mot de passe du panneau admin. Le nouveau mot de passe prend effet imm\u00E9diatement.",
+    settings_danger_info: "R\u00E9initialiser tous les biens \u00E0 la configuration par d\u00E9faut. Cette action est irr\u00E9versible.",
+    doc_title: "IMWIRE - Nos Biens",
+    no_properties_found: "Aucun bien trouv\u00E9",
+    toast_saved: "Enregistr\u00E9",
+    toast_deleted: "Bien supprim\u00E9",
+    toast_imported: "Import\u00E9 avec succ\u00E8s",
+    toast_exported: "Export\u00E9",
+    toast_pw_changed: "Mot de passe mis \u00E0 jour",
+    toast_reset: "R\u00E9initialis\u00E9 aux valeurs par d\u00E9faut",
+    toast_wrong_pw: "Mot de passe incorrect",
+    toast_login: "Connect\u00E9",
+    edit_property: "Modifier",
+    add_property: "Ajouter",
+    property_word: "Bien",
+    title_required: "Le titre est requis",
+    pw_too_short: "Le mot de passe doit contenir au moins 4 caract\u00E8res",
+    import_invalid: "\u00C9chec de l'import : JSON invalide",
+    save_failed: "\u00C9chec de l'enregistrement - stockage plein ?"
+  }
+};
+
+/* =====================================================================
+   DEFAULT PROPERTIES (bilingual)
+   ===================================================================== */
+const DEFAULT_PROPERTIES = [
+  {
+    id: "plainpalais-balcon",
+    status: "for-rent",
+    type: "apartment",
+    rooms: 3,
+    area: 70,
+    price: null,
+    priceUnit: null,
+    images: [
+      "https://static.wixstatic.com/media/216e35_cddd9bf843a24910ab27be153e5cd37f~mv2.jpg",
+      "https://static.wixstatic.com/media/216e35_215d79e2adf846ffb9b6da787f8a8a05~mv2.jpg",
+      "https://static.wixstatic.com/media/216e35_9383bf0aa4e74d9f82a374630b876793~mv2.jpg",
+      "https://static.wixstatic.com/media/216e35_fc94baf97a6048758b36e9ca08cd4893~mv2.jpg"
+    ],
+    gradient: null,
+    en: {
+      title: "3-room Apartment with Balconies",
+      location: "Geneva, Plainpalais",
+      priceLabel: "Price on request",
+      specs: ["3 rooms", "70 m\u00B2", "Furnished"],
+      description: "Beautifully renovated top-floor (4th) apartment, bright and airy, with a balcony off every room. One bedroom furnished."
+    },
+    fr: {
+      title: "Appartement 3 pi\u00E8ces avec balcons",
+      location: "Gen\u00E8ve, Plainpalais",
+      priceLabel: "Prix sur demande",
+      specs: ["3 pi\u00E8ces", "70 m\u00B2", "Meubl\u00E9"],
+      description: "Appartement au 4e \u00E9tage enti\u00E8rement r\u00E9nov\u00E9, lumineux et a\u00E9r\u00E9, avec un balcon par pi\u00E8ce. Une chambre meubl\u00E9e."
+    }
+  },
+  {
+    id: "plainpalais-furnished",
+    status: "for-rent",
+    type: "apartment",
+    rooms: 3,
+    area: 70,
+    price: null,
+    priceUnit: null,
+    images: [
+      "https://static.wixstatic.com/media/216e35_de70528bc54645ed82cea36541d432be~mv2.jpg",
+      "https://static.wixstatic.com/media/216e35_49620864cfd34e9e997b0f89da50f9f2~mv2.jpg",
+      "https://static.wixstatic.com/media/216e35_edf2b49a9d84425fb6ab449b4768ec9f~mv2.jpg",
+      "https://static.wixstatic.com/media/216e35_93c55f2b393f4dd69613f2b29a25204f~mv2.jpg"
+    ],
+    gradient: null,
+    en: {
+      title: "Spacious Furnished 3-room Apartment",
+      location: "Geneva, Plainpalais \u2014 City Centre",
+      priceLabel: "Price on request",
+      specs: ["3 rooms", "70 m\u00B2", "Fully equipped"],
+      description: "Stylish, fully furnished three-room apartment in the heart of Plainpalais, ideal for executive rentals. Turn-key comfort with all amenities included."
+    },
+    fr: {
+      title: "Grand 3 pi\u00E8ces meubl\u00E9",
+      location: "Gen\u00E8ve, Plainpalais \u2014 Centre-ville",
+      priceLabel: "Prix sur demande",
+      specs: ["3 pi\u00E8ces", "70 m\u00B2", "Enti\u00E8rement \u00E9quip\u00E9"],
+      description: "Appartement 3 pi\u00E8ces enti\u00E8rement meubl\u00E9 avec style, au c\u0153ur de Plainpalais, id\u00E9al pour la location executive. Confort cl\u00E9-en-main avec toutes les commodit\u00E9s."
+    }
+  },
+  {
+    id: "cologny-lakefront-estate",
+    status: "off-market",
+    type: "villa",
+    rooms: 9,
+    area: null,
+    price: null,
+    priceUnit: null,
+    images: [],
+    gradient: "linear-gradient(135deg,#0a1628,#142440,#1e3a5c)",
+    en: {
+      title: "Lakefront Estate with Private Grounds",
+      location: "Cologny",
+      priceLabel: "On request",
+      specs: ["9 rooms", "Lake view", "Private"],
+      description: "An exceptional private estate with direct lake frontage, mature grounds and discreet access. Shown only to qualified, pre-approved buyers."
+    },
+    fr: {
+      title: "Domaine en bord de lac",
+      location: "Cologny",
+      priceLabel: "Sur demande",
+      specs: ["9 pi\u00E8ces", "Vue lac", "Priv\u00E9"],
+      description: "Domaine priv\u00E9 d'exception avec acc\u00E8s direct au lac, parc arbor\u00E9 et entr\u00E9e discr\u00E8te. Visite uniquement pour acqu\u00E9reurs qualifi\u00E9s et pr\u00E9-approuv\u00E9s."
+    }
+  },
+  {
+    id: "eaux-vives-penthouse",
+    status: "off-market",
+    type: "apartment",
+    rooms: 5,
+    area: null,
+    price: null,
+    priceUnit: null,
+    images: [],
+    gradient: "linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)",
+    en: {
+      title: "Rooftop Penthouse with Terrace",
+      location: "Geneva, Eaux-Vives",
+      priceLabel: "On request",
+      specs: ["5 rooms", "Terrace", "Lake view"],
+      description: "A rare rooftop penthouse with a wraparound terrace and uninterrupted views over the lake and city. Private viewing only."
+    },
+    fr: {
+      title: "Penthouse avec terrasse",
+      location: "Gen\u00E8ve, Eaux-Vives",
+      priceLabel: "Sur demande",
+      specs: ["5 pi\u00E8ces", "Terrasse", "Vue lac"],
+      description: "Penthouse rare avec terrasse panoramique et vues d\u00E9gag\u00E9es sur le lac et la ville. Visite priv\u00E9e uniquement."
+    }
+  },
+  {
+    id: "nyon-villa-pool",
+    status: "off-market",
+    type: "villa",
+    rooms: 7,
+    area: null,
+    price: null,
+    priceUnit: null,
+    images: [],
+    gradient: "linear-gradient(135deg,#1a2a1a,#2a3a2a,#3a4a3a)",
+    en: {
+      title: "Contemporary Villa with Pool",
+      location: "Nyon, Residential Quarter",
+      priceLabel: "On request",
+      specs: ["7 rooms", "Pool", "Garden"],
+      description: "A contemporary architect-designed villa in a sought-after residential quarter of Nyon, with swimming pool and landscaped garden."
+    },
+    fr: {
+      title: "Villa contemporaine avec piscine",
+      location: "Nyon, quartier r\u00E9sidentiel",
+      priceLabel: "Sur demande",
+      specs: ["7 pi\u00E8ces", "Piscine", "Jardin"],
+      description: "Villa d'architecte contemporaine dans un quartier r\u00E9sidentiel recherch\u00E9 de Nyon, avec piscine et jardin paysager."
+    }
+  },
+  {
+    id: "vieille-ville-haussmann",
+    status: "off-market",
+    type: "apartment",
+    rooms: 6,
+    area: null,
+    price: null,
+    priceUnit: null,
+    images: [],
+    gradient: "linear-gradient(135deg,#0d1b2a,#1b2838,#2a4a5e)",
+    en: {
+      title: "Haussmannian Apartment, High Floor",
+      location: "Geneva, Vieille Ville",
+      priceLabel: "On request",
+      specs: ["6 rooms", "Period features", "High ceilings"],
+      description: "A top-floor Haussmannian apartment with exceptional period details, preserved mouldings and dramatic ceiling heights in the heart of Old Geneva."
+    },
+    fr: {
+      title: "Appartement haussmannien, \u00E9tage \u00E9lev\u00E9",
+      location: "Gen\u00E8ve, Vieille-Ville",
+      priceLabel: "Sur demande",
+      specs: ["6 pi\u00E8ces", "Caract\u00E8re d'\u00E9poque", "Hauteur sous plafond"],
+      description: "Appartement haussmannien au dernier \u00E9tage, d\u00E9tails d'\u00E9poque exceptionnels, moulures pr\u00E9serv\u00E9es et hauteur sous plafond au c\u0153ur de la Vieille-Ville."
+    }
+  },
+  {
+    id: "satigny-arcade",
+    status: "rented",
+    type: "commercial",
+    rooms: null,
+    area: 200,
+    price: 3800,
+    priceUnit: "/month",
+    images: [
+      "https://static.wixstatic.com/media/216e35_db3b74771dea4372b9038b2c989ad9af~mv2.png",
+      "https://static.wixstatic.com/media/216e35_b12333f6bd7d4509ba3a043433cc1e66~mv2.jpeg",
+      "https://static.wixstatic.com/media/216e35_4fa4d64c77fd4368a4ecd3e526ec17ce~mv2.jpeg"
+    ],
+    gradient: null,
+    en: {
+      title: "Commercial Arcade in Satigny Village",
+      location: "Satigny, 200m from station",
+      priceLabel: "CHF 3,800",
+      specs: ["200 m\u00B2", "Commercial", "Village centre"],
+      description: "Successfully rented. Prime ground-floor arcade space in the centre of Satigny village, ideal for retail, office or service-based use."
+    },
+    fr: {
+      title: "Arcade commerciale \u00E0 Satigny",
+      location: "Satigny, \u00E0 200m de la gare",
+      priceLabel: "CHF 3'800",
+      specs: ["200 m\u00B2", "Commercial", "Centre du village"],
+      description: "Lou\u00E9e avec succ\u00E8s. Arcade rez-de-chauss\u00E9e au c\u0153ur du village de Satigny, id\u00E9ale pour commerce, bureau ou service."
+    }
+  },
+  {
+    id: "fribourg-mixed-use",
+    status: "sold",
+    type: "commercial",
+    rooms: null,
+    area: null,
+    price: null,
+    priceUnit: null,
+    images: [
+      "https://static.wixstatic.com/media/216e35_5f558a0d762c4fe89fc96af72b165c0f~mv2.jpg",
+      "https://static.wixstatic.com/media/216e35_cc95f9ceee0f42c782a7b9f969cfdcc6~mv2.jpg",
+      "https://static.wixstatic.com/media/216e35_29a9856f45e247229ede86844a69ccb7~mv2.jpeg"
+    ],
+    gradient: null,
+    en: {
+      title: "Mixed-use Investment Building \u2014 4.0% Yield",
+      location: "Fribourg, City Centre",
+      priceLabel: "Price on request",
+      specs: ["6 apartments", "Ground-floor offices", "Yield 4.0%"],
+      description: "Successfully sold. A mixed-use investment building in Fribourg city centre combining residential units and ground-floor commercial space with a 4.0% yield."
+    },
+    fr: {
+      title: "Immeuble mixte d'investissement \u2014 Rendement 4,0%",
+      location: "Fribourg, centre-ville",
+      priceLabel: "Prix sur demande",
+      specs: ["6 appartements", "Bureaux en rez-de-chauss\u00E9e", "Rendement 4,0%"],
+      description: "Vendu avec succ\u00E8s. Immeuble mixte d'investissement au centre de Fribourg, combinant logements et espaces commerciaux en rez-de-chauss\u00E9e avec un rendement de 4,0%."
+    }
+  },
+  {
+    id: "le-vaud-villas",
+    status: "sold",
+    type: "villa",
+    rooms: 4.5,
+    area: null,
+    price: 1390000,
+    priceUnit: null,
+    images: [
+      "https://static.wixstatic.com/media/216e35_21bacc9659b9481dbd47ae1638f40c5e~mv2.jpg",
+      "https://static.wixstatic.com/media/216e35_a3b283ecb0754033b859aa5dbbcf79b9~mv2.jpg",
+      "https://static.wixstatic.com/media/216e35_de17c76bbfcb40bea1827ef03ee9c1b1~mv2.jpg"
+    ],
+    gradient: null,
+    en: {
+      title: "Two 4.5-room Villas \u2014 Off-plan",
+      location: "Le Vaud, Vaud",
+      priceLabel: "CHF 1,390,000",
+      specs: ["4.5 rooms", "500 m\u00B2 plot", "Alps view"],
+      description: "Successfully sold off-plan. Two elegant 4.5-room villas in the village of Le Vaud, each on a 500 m\u00B2 plot with open views towards the Alps."
+    },
+    fr: {
+      title: "Deux villas 4,5 pi\u00E8ces \u2014 Sur plan",
+      location: "Le Vaud, Vaud",
+      priceLabel: "CHF 1'390'000",
+      specs: ["4,5 pi\u00E8ces", "Parcelle 500 m\u00B2", "Vue Alpes"],
+      description: "Vendues sur plan. Deux villas \u00E9l\u00E9gantes de 4,5 pi\u00E8ces dans le village du Vaud, chacune sur une parcelle de 500 m\u00B2 avec vue d\u00E9gag\u00E9e sur les Alpes."
+    }
+  }
+];
+
+/* =========== STATE =========== */
+const STORAGE_KEY = 'imwire_properties';
+const PASS_KEY = 'imwire_admin_password';
+const USER_KEY = 'imwire_admin_username';
+const SESSION_AUTH = 'imwire_admin_auth';
+const LANG_KEY = 'imwire_lang';
+
+let currentLang = initLang();
+let properties = loadProperties();
+let filters = { status: 'all', type: 'all', rooms: 'all', search: '' };
+let lightboxState = { propId: null, index: 0, touchStartX: null };
+let lastFocusedBeforeDialog = null;
+
+function initLang() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlLang = urlParams.get('lang');
+  if (urlLang === 'fr' || urlLang === 'en') {
+    try { localStorage.setItem(LANG_KEY, urlLang); } catch (e) {}
+    return urlLang;
+  }
+  try {
+    const stored = localStorage.getItem(LANG_KEY);
+    if (stored === 'fr' || stored === 'en') return stored;
+  } catch (e) {}
+  return 'en';
+}
+
+/* =========== I18N HELPERS =========== */
+function t(key) {
+  return (I18N[currentLang] && I18N[currentLang][key]) || (I18N.en[key] || key);
+}
+
+function tProp(prop, field) {
+  const langData = prop[currentLang] || prop.en || {};
+  const enData = prop.en || {};
+  if (langData[field] !== undefined && langData[field] !== null && langData[field] !== '') {
+    return langData[field];
+  }
+  return enData[field];
+}
+
+function tBadge(status) {
+  const key = 'badge_' + status.replace(/-/g, '_');
+  return t(key);
+}
+
+function formatCount(n) {
+  return n + ' ' + t(n === 1 ? 'count_one' : 'count_many');
+}
+
+/* =========== IMAGE URL RESOLVER =========== */
+function resolveImageUrl(url) {
+  if (!url) return '';
+  if (/^(https?:)?\/\//i.test(url) || url.startsWith('data:')) return url;
+  return IMAGE_BASE_URL + url;
+}
+
+/* =========== LOAD / SAVE =========== */
+function loadProperties() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length) return migrateProperties(parsed);
+    }
+  } catch (e) { /* fall through */ }
+  return JSON.parse(JSON.stringify(DEFAULT_PROPERTIES));
+}
+
+/**
+ * Migrate legacy single-language properties to bilingual format.
+ * If a property already has .en or .fr keys, leave it alone.
+ */
+function migrateProperties(arr) {
+  return arr.map(p => {
+    if (p.en || p.fr) return p;
+    const migrated = {
+      id: p.id,
+      status: p.status,
+      type: p.type,
+      rooms: p.rooms,
+      area: p.area,
+      price: p.price,
+      priceUnit: p.priceUnit,
+      images: p.images || [],
+      gradient: p.gradient,
+      en: {
+        title: p.title || '',
+        location: p.location || '',
+        priceLabel: p.priceLabel || '',
+        specs: p.specs || [],
+        description: p.description || ''
+      },
+      fr: {
+        title: p.title || '',
+        location: p.location || '',
+        priceLabel: p.priceLabel || '',
+        specs: p.specs || [],
+        description: p.description || ''
+      }
+    };
+    return migrated;
+  });
+}
+
+function saveProperties() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(properties));
+  } catch (e) {
+    showToast(t('save_failed'));
+  }
+}
+
+/* =========== UTIL =========== */
+function showToast(message) {
+  const el = document.getElementById('toast');
+  el.textContent = message;
+  el.classList.add('show');
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+function formatPrice(p) {
+  if (p.price && p.price > 0) {
+    const formatted = 'CHF ' + p.price.toLocaleString('en-CH').replace(/,/g, "'");
+    return formatted + (p.priceUnit ? '<span class="unit">' + escapeHTML(p.priceUnit) + '</span>' : '');
+  }
+  const priceLabel = tProp(p, 'priceLabel') || t('count_many');
+  return escapeHTML(priceLabel || '');
+}
+
+function escapeHTML(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function debounce(fn, delay) {
+  let timer;
+  return function() {
+    clearTimeout(timer);
+    const args = arguments;
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+
+function statusRank(s) {
+  return { 'for-rent': 1, 'for-sale': 2, 'off-market': 3, 'sold': 4, 'rented': 5 }[s] || 99;
+}
+
+/* =========== APPLY I18N TO STATIC ELEMENTS =========== */
+function applyI18n() {
+  document.documentElement.lang = currentLang;
+  document.title = t('doc_title');
+
+  // Header
+  document.getElementById('headerLabel').textContent = t('label');
+  document.getElementById('headerTitle').innerHTML = escapeHTML(t('title_prefix')) + ' <em>' + escapeHTML(t('title_highlight')) + '</em>';
+  document.getElementById('headerSubtitle').textContent = t('subtitle');
+
+  // Search placeholder
+  document.getElementById('searchInput').placeholder = t('search_placeholder');
+
+  // Count label
+  updateCountLabel();
+
+  // CTA
+  document.getElementById('ctaTitle').innerHTML = escapeHTML(t('cta_title_prefix')) + ' <em>' + escapeHTML(t('cta_title_highlight')) + '</em>?';
+  document.getElementById('ctaText').textContent = t('cta_text');
+  document.getElementById('contactBtn').textContent = t('cta_button');
+
+  // Lightbox aria-labels
+  document.getElementById('lbClose').setAttribute('aria-label', t('lightbox_close'));
+  document.getElementById('lbPrev').setAttribute('aria-label', t('lightbox_prev'));
+  document.getElementById('lbNext').setAttribute('aria-label', t('lightbox_next'));
+
+  // Admin header
+  document.getElementById('adminHeaderTitle').innerHTML = t('admin_title').replace(/(Admin|Panneau)/, '$1 <span>') + '</span>';
+  // Simpler: just set textContent with a span span injection
+  const adminTitle = t('admin_title');
+  const parts = adminTitle.split(' ');
+  if (parts.length > 1) {
+    document.getElementById('adminHeaderTitle').innerHTML = escapeHTML(parts[0]) + ' <span>' + escapeHTML(parts.slice(1).join(' ')) + '</span>';
+  } else {
+    document.getElementById('adminHeaderTitle').textContent = adminTitle;
+  }
+
+  // Settings headings & info
+  document.getElementById('settingsBackupTitle').textContent = t('settings_backup');
+  document.getElementById('settingsSecurityTitle').textContent = t('settings_security');
+  document.getElementById('settingsDangerTitle').textContent = t('settings_danger');
+  document.getElementById('settingsInfoP').textContent = t('settings_info');
+  const secInfo = document.getElementById('settingsSecurityInfo');
+  if (secInfo) secInfo.textContent = t('settings_security_info');
+  document.getElementById('newPassword').placeholder = t('settings_change_pw_placeholder');
+  const newUserInput = document.getElementById('newUsername');
+  if (newUserInput) newUserInput.placeholder = t('settings_change_user_placeholder');
+  const curUserEl = document.getElementById('currentUserEl');
+  if (curUserEl) curUserEl.textContent = getUsername();
+
+  // Login modal strings
+  const loginTitle = document.getElementById('loginTitle');
+  if (loginTitle) {
+    const titleText = t('login_title');
+    const parts = titleText.split(' ');
+    if (parts.length > 1) {
+      loginTitle.innerHTML = escapeHTML(parts[0]) + ' <span>' + escapeHTML(parts.slice(1).join(' ')) + '</span>';
+    } else {
+      loginTitle.textContent = titleText;
+    }
+  }
+  const loginSub = document.getElementById('loginSub');
+  if (loginSub) loginSub.textContent = t('login_sub');
+  const lu = document.getElementById('loginUserLabel'); if (lu) lu.textContent = t('login_user_label');
+  const lp = document.getElementById('loginPassLabel'); if (lp) lp.textContent = t('login_pass_label');
+
+  // Admin chip tooltip
+  const chipTip = document.getElementById('adminChipTip');
+  if (chipTip) chipTip.textContent = t('admin_chip_tip');
+  const chip = document.getElementById('adminChip');
+  if (chip) chip.setAttribute('aria-label', t('admin_chip_tip'));
+
+  // Form images hint
+  const imagesHint = document.getElementById('imagesHint');
+  if (imagesHint) imagesHint.textContent = t('form_images_help');
+
+  // All [data-i18n]
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (key) el.textContent = t(key);
+  });
+
+  // Update lang toggle active state
+  document.querySelectorAll('.lang-toggle button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === currentLang);
+  });
+}
+
+function updateCountLabel() {
+  const num = parseInt(document.getElementById('countNum').textContent || '0', 10);
+  document.getElementById('countLabel').textContent = t(num === 1 ? 'count_one' : 'count_many');
+}
+
+/* =========== LANGUAGE SWITCHING =========== */
+function setLang(lang) {
+  if (lang !== 'en' && lang !== 'fr') return;
+  if (lang === currentLang) return;
+  currentLang = lang;
+  try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
+  applyI18n();
+  renderGrid();
+  // If admin drawer is open, re-render it too
+  if (adminDrawer.classList.contains('active')) {
+    renderAdminList();
+  }
+  reportHeight();
+}
+
+document.querySelectorAll('.lang-toggle button').forEach(btn => {
+  btn.addEventListener('click', () => setLang(btn.dataset.lang));
+});
+
+/* =========== FILTER + RENDER =========== */
+function filteredProperties() {
+  const q = filters.search.trim().toLowerCase();
+  return properties
+    .filter(p => {
+      if (filters.status !== 'all' && p.status !== filters.status) return false;
+      if (filters.type !== 'all' && p.type !== filters.type) return false;
+      if (filters.rooms !== 'all') {
+        if (filters.rooms === '5') {
+          if (!p.rooms || p.rooms < 5) return false;
+        } else {
+          if (String(Math.floor(p.rooms || 0)) !== filters.rooms) return false;
+        }
+      }
+      if (q) {
+        const title = tProp(p, 'title') || '';
+        const location = tProp(p, 'location') || '';
+        const description = tProp(p, 'description') || '';
+        // Also search the other language for convenience
+        const otherLang = currentLang === 'en' ? 'fr' : 'en';
+        const otherData = p[otherLang] || {};
+        const hay = (title + ' ' + location + ' ' + description + ' ' +
+          (otherData.title || '') + ' ' + (otherData.location || '') + ' ' + (otherData.description || '')).toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    })
+    .sort((a, b) => statusRank(a.status) - statusRank(b.status));
+}
+
+function renderGrid() {
+  const grid = document.getElementById('grid');
+  const list = filteredProperties();
+  document.getElementById('countNum').textContent = list.length;
+  updateCountLabel();
+
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><h3>' + escapeHTML(t('no_properties_found')) + '</h3><p>' + escapeHTML(t('empty_state')) + '</p></div>';
+    reportHeight();
+    return;
+  }
+
+  grid.innerHTML = list.map(p => renderCard(p)).join('');
+
+  const cards = grid.querySelectorAll('.card');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('reveal'), i * 50);
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.05 });
+    cards.forEach(c => io.observe(c));
+  } else {
+    cards.forEach(c => c.classList.add('reveal'));
+  }
+
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      const id = card.dataset.id;
+      const prop = properties.find(x => x.id === id);
+      if (prop && prop.images && prop.images.length) {
+        openLightbox(prop, 0);
+      }
+    });
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        card.click();
+      }
+    });
+  });
+
+  reportHeight();
+}
+
+function renderCard(p) {
+  const hasImages = p.images && p.images.length > 0;
+  const firstImage = hasImages ? resolveImageUrl(p.images[0]) : null;
+  const isOffMarket = p.status === 'off-market';
+  const isSold = p.status === 'sold';
+  const isRented = p.status === 'rented';
+
+  const title = tProp(p, 'title') || '';
+  const location = tProp(p, 'location') || '';
+  const description = tProp(p, 'description') || '';
+  const specsArr = tProp(p, 'specs') || [];
+
+  let imageBlock;
+  if (hasImages) {
+    imageBlock = '<img src="' + escapeHTML(firstImage) + '" alt="' + escapeHTML(title) + '" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.style.background=\'linear-gradient(135deg,#1a1a1a,#2a2a2a)\'" />';
+  } else if (p.gradient) {
+    imageBlock = '<div class="card-gradient" style="background:' + escapeHTML(p.gradient) + '"></div>';
+  } else {
+    imageBlock = '<div class="card-gradient" style="background:linear-gradient(135deg,#1a1a1a,#2a2a2a)"></div>';
+  }
+
+  const galleryCount = hasImages && p.images.length > 1
+    ? '<div class="gallery-count"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg> ' + p.images.length + '</div>'
+    : '';
+
+  let overlay = '';
+  if (isOffMarket) {
+    overlay = '<div class="private-overlay"><span>' + escapeHTML(t('private_viewing')) + '</span></div>';
+  } else if (isSold) {
+    overlay = '<div class="stamp sold">' + escapeHTML(tBadge('sold')) + '</div>';
+  } else if (isRented) {
+    overlay = '<div class="stamp rented">' + escapeHTML(tBadge('rented')) + '</div>';
+  }
+
+  const classes = ['card'];
+  if (isOffMarket) classes.push('is-off-market');
+  if (isSold) classes.push('is-sold');
+  if (isRented) classes.push('is-rented');
+
+  const specs = specsArr.slice(0, 4).map(s => '<span class="spec">' + escapeHTML(s) + '</span>').join('');
+
+  return (
+    '<article class="' + classes.join(' ') + '" data-id="' + escapeHTML(p.id) + '" tabindex="0" role="button" aria-label="' + escapeHTML(title + ', ' + location) + '">' +
+      '<div class="card-image">' +
+        imageBlock +
+        '<div class="badge ' + escapeHTML(p.status) + '">' + escapeHTML(tBadge(p.status)) + '</div>' +
+        galleryCount +
+        overlay +
+      '</div>' +
+      '<div class="card-body">' +
+        '<h3 class="card-title">' + escapeHTML(title) + '</h3>' +
+        '<div class="card-location"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>' + escapeHTML(location) + '</div>' +
+        (specs ? '<div class="card-specs">' + specs + '</div>' : '') +
+        '<p class="card-desc">' + escapeHTML(description) + '</p>' +
+        '<div class="card-price">' + formatPrice(p) + '</div>' +
+      '</div>' +
+    '</article>'
+  );
+}
+
+/* =========== FILTER HANDLERS =========== */
+document.getElementById('statusChips').addEventListener('click', (e) => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  document.querySelectorAll('#statusChips .chip').forEach(c => {
+    c.classList.remove('active');
+    c.setAttribute('aria-pressed', 'false');
+  });
+  chip.classList.add('active');
+  chip.setAttribute('aria-pressed', 'true');
+  filters.status = chip.dataset.status;
+  renderGrid();
+});
+
+document.getElementById('typeFilter').addEventListener('change', (e) => {
+  filters.type = e.target.value;
+  renderGrid();
+});
+
+document.getElementById('roomsFilter').addEventListener('change', (e) => {
+  filters.rooms = e.target.value;
+  renderGrid();
+});
+
+document.getElementById('searchInput').addEventListener('input', debounce((e) => {
+  filters.search = e.target.value;
+  renderGrid();
+}, 200));
+
+/* =========== LIGHTBOX =========== */
+const lightbox = document.getElementById('lightbox');
+const lbImage = document.getElementById('lbImage');
+const lbTitle = document.getElementById('lbTitle');
+const lbCounter = document.getElementById('lbCounter');
+const lbThumbs = document.getElementById('lbThumbs');
+
+function openLightbox(prop, index) {
+  lightboxState.propId = prop.id;
+  lightboxState.index = index;
+  lastFocusedBeforeDialog = document.activeElement;
+  lbTitle.textContent = tProp(prop, 'title') || '';
+  updateLightbox();
+  lightbox.classList.add('active');
+  lightbox.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('lbClose').focus();
+}
+
+function closeLightbox() {
+  lightbox.classList.remove('active');
+  lightbox.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  lbImage.classList.remove('loaded');
+  if (lastFocusedBeforeDialog && lastFocusedBeforeDialog.focus) {
+    lastFocusedBeforeDialog.focus();
+  }
+}
+
+function updateLightbox() {
+  const prop = properties.find(p => p.id === lightboxState.propId);
+  if (!prop || !prop.images || !prop.images.length) return;
+  const i = lightboxState.index;
+  const title = tProp(prop, 'title') || '';
+  lbImage.classList.remove('loaded');
+  lbImage.src = resolveImageUrl(prop.images[i]);
+  lbImage.alt = title + ' - image ' + (i + 1);
+  lbImage.onload = () => lbImage.classList.add('loaded');
+  lbCounter.textContent = (i + 1) + ' / ' + prop.images.length;
+
+  lbThumbs.innerHTML = prop.images.map((url, idx) =>
+    '<div class="lightbox-thumb' + (idx === i ? ' active' : '') + '" data-i="' + idx + '"><img src="' + escapeHTML(resolveImageUrl(url)) + '" alt="Thumbnail ' + (idx + 1) + '" loading="lazy" /></div>'
+  ).join('');
+
+  lbThumbs.querySelectorAll('.lightbox-thumb').forEach(tEl => {
+    tEl.addEventListener('click', () => {
+      lightboxState.index = parseInt(tEl.dataset.i, 10);
+      updateLightbox();
+    });
+  });
+}
+
+function lbPrev() {
+  const prop = properties.find(p => p.id === lightboxState.propId);
+  if (!prop) return;
+  lightboxState.index = (lightboxState.index - 1 + prop.images.length) % prop.images.length;
+  updateLightbox();
+}
+
+function lbNext() {
+  const prop = properties.find(p => p.id === lightboxState.propId);
+  if (!prop) return;
+  lightboxState.index = (lightboxState.index + 1) % prop.images.length;
+  updateLightbox();
+}
+
+document.getElementById('lbClose').addEventListener('click', closeLightbox);
+document.getElementById('lbPrev').addEventListener('click', lbPrev);
+document.getElementById('lbNext').addEventListener('click', lbNext);
+lightbox.addEventListener('click', (e) => {
+  if (e.target === lightbox) closeLightbox();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (!lightbox.classList.contains('active')) return;
+  if (e.key === 'Escape') closeLightbox();
+  else if (e.key === 'ArrowLeft') lbPrev();
+  else if (e.key === 'ArrowRight') lbNext();
+});
+
+// Touch swipe
+const lbStage = document.getElementById('lbStage');
+lbStage.addEventListener('touchstart', (e) => {
+  lightboxState.touchStartX = e.touches[0].clientX;
+}, { passive: true });
+lbStage.addEventListener('touchend', (e) => {
+  if (lightboxState.touchStartX == null) return;
+  const dx = e.changedTouches[0].clientX - lightboxState.touchStartX;
+  if (Math.abs(dx) > 50) {
+    if (dx > 0) lbPrev(); else lbNext();
+  }
+  lightboxState.touchStartX = null;
+}, { passive: true });
+
+/* =========== CONTACT CTA =========== */
+document.getElementById('contactBtn').addEventListener('click', (e) => {
+  try {
+    window.parent.postMessage(JSON.stringify({ type: 'scrollToContact' }), '*');
+  } catch (err) { /* ignore */ }
+});
+
+/* =========== ADMIN =========== */
+const adminDrawer = document.getElementById('adminDrawer');
+const formModal = document.getElementById('formModal');
+
+function isAuthed() {
+  return sessionStorage.getItem(SESSION_AUTH) === '1';
+}
+
+function getPassword() {
+  return localStorage.getItem(PASS_KEY) || ADMIN_PASSWORD;
+}
+
+function getUsername() {
+  return localStorage.getItem(USER_KEY) || ADMIN_USERNAME;
+}
+
+function setAuthed(val) {
+  if (val) sessionStorage.setItem(SESSION_AUTH, '1');
+  else sessionStorage.removeItem(SESSION_AUTH);
+  updateChipState();
+}
+
+function updateChipState() {
+  const chip = document.getElementById('adminChip');
+  if (!chip) return;
+  chip.classList.toggle('authed', isAuthed());
+}
+
+/* ---------- Login modal ---------- */
+const loginModal = document.getElementById('loginModal');
+let pendingAction = null; // callback to run after successful login
+
+function openLogin(onSuccess) {
+  pendingAction = typeof onSuccess === 'function' ? onSuccess : null;
+  lastFocusedBeforeDialog = document.activeElement;
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginError').textContent = '';
+  loginModal.classList.add('active');
+  loginModal.setAttribute('aria-hidden', 'false');
+  setTimeout(() => { document.getElementById('loginUser').focus(); }, 50);
+}
+
+function closeLogin() {
+  loginModal.classList.remove('active');
+  loginModal.setAttribute('aria-hidden', 'true');
+  pendingAction = null;
+  if (lastFocusedBeforeDialog && lastFocusedBeforeDialog.focus) {
+    try { lastFocusedBeforeDialog.focus(); } catch (e) {}
+  }
+}
+
+document.getElementById('loginCancel').addEventListener('click', closeLogin);
+loginModal.addEventListener('click', (e) => {
+  if (e.target === loginModal) closeLogin();
+});
+
+document.getElementById('loginForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  if (u === getUsername() && p === getPassword()) {
+    setAuthed(true);
+    const action = pendingAction;
+    closeLogin();
+    showToast(t('toast_login'));
+    if (action) action();
+    else openAdminDrawer();
+  } else {
+    const err = document.getElementById('loginError');
+    err.textContent = t('login_invalid');
+    // shake feedback
+    const content = loginModal.querySelector('.login-content');
+    content.style.animation = 'none';
+    // trigger reflow then reapply
+    void content.offsetWidth;
+    content.style.animation = 'loginIn 0.35s var(--ease)';
+  }
+});
+
+function authenticate(onSuccess) {
+  if (isAuthed()) {
+    if (typeof onSuccess === 'function') onSuccess();
+    return true;
+  }
+  openLogin(onSuccess);
+  return false;
+}
+
+function openAdminDrawer() {
+  lastFocusedBeforeDialog = document.activeElement;
+  adminDrawer.classList.add('active');
+  adminDrawer.setAttribute('aria-hidden', 'false');
+  renderAdminList();
+  // refresh current-user label in settings
+  const curUserEl = document.getElementById('currentUserEl');
+  if (curUserEl) curUserEl.textContent = getUsername();
+  document.getElementById('adminClose').focus();
+}
+
+function openAdmin() {
+  authenticate(openAdminDrawer);
+}
+
+function logout() {
+  setAuthed(false);
+  closeAdmin();
+  showToast(t('toast_logout'));
+}
+
+/* ---------- Admin chip click ---------- */
+document.getElementById('adminChip').addEventListener('click', () => {
+  if (isAuthed()) openAdminDrawer();
+  else openLogin();
+});
+
+/* ---------- Admin drawer logout button ---------- */
+document.getElementById('adminLogoutBtn').addEventListener('click', logout);
+
+function closeAdmin() {
+  adminDrawer.classList.remove('active');
+  adminDrawer.setAttribute('aria-hidden', 'true');
+  if (lastFocusedBeforeDialog && lastFocusedBeforeDialog.focus) {
+    lastFocusedBeforeDialog.focus();
+  }
+}
+
+document.getElementById('adminClose').addEventListener('click', closeAdmin);
+
+document.querySelectorAll('.admin-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.admin-tab').forEach(tt => {
+      tt.classList.remove('active');
+      tt.setAttribute('aria-selected', 'false');
+    });
+    tab.classList.add('active');
+    tab.setAttribute('aria-selected', 'true');
+    const target = tab.dataset.tab;
+    document.getElementById('adminPropertiesTab').style.display = target === 'properties' ? 'block' : 'none';
+    document.getElementById('adminSettingsTab').style.display = target === 'settings' ? 'block' : 'none';
+  });
+});
+
+function renderAdminList() {
+  const list = document.getElementById('adminPropList');
+  list.innerHTML = properties.map(p => {
+    const rawThumb = (p.images && p.images[0]) ? p.images[0] : '';
+    const thumb = rawThumb ? resolveImageUrl(rawThumb) : '';
+    const thumbStyle = thumb ? 'background-image:url(\'' + escapeHTML(thumb) + '\')' : (p.gradient ? 'background:' + escapeHTML(p.gradient) : '');
+    const title = tProp(p, 'title') || '';
+    return (
+      '<div class="admin-prop-row">' +
+        '<div class="admin-prop-thumb" style="' + thumbStyle + '"></div>' +
+        '<div class="admin-prop-info">' +
+          '<div class="admin-prop-title">' + escapeHTML(title) + '</div>' +
+          '<div class="admin-prop-status">' + escapeHTML(tBadge(p.status)) + '</div>' +
+        '</div>' +
+        '<div class="admin-prop-actions">' +
+          '<button class="admin-edit-btn" data-edit="' + escapeHTML(p.id) + '">' + escapeHTML(t('btn_edit')) + '</button>' +
+          '<button class="admin-delete-btn" data-del="' + escapeHTML(p.id) + '">' + escapeHTML(t('btn_delete')) + '</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }).join('');
+
+  list.querySelectorAll('[data-edit]').forEach(b => {
+    b.addEventListener('click', () => openForm(b.dataset.edit));
+  });
+  list.querySelectorAll('[data-del]').forEach(b => {
+    b.addEventListener('click', () => deleteProperty(b.dataset.del));
+  });
+}
+
+document.getElementById('addPropertyBtn').addEventListener('click', () => openForm(null));
+
+function deleteProperty(id) {
+  const prop = properties.find(p => p.id === id);
+  if (!prop) return;
+  if (!confirm(t('confirm_delete'))) return;
+  properties = properties.filter(p => p.id !== id);
+  saveProperties();
+  renderAdminList();
+  renderGrid();
+  showToast(t('toast_deleted'));
+}
+
+/* =========== FORM MODAL =========== */
+function openForm(id) {
+  const isEdit = !!id;
+  const prop = isEdit ? properties.find(p => p.id === id) : {
+    id: '',
+    status: 'for-rent',
+    type: 'apartment',
+    rooms: null,
+    area: null,
+    price: null,
+    priceUnit: '',
+    images: [],
+    gradient: '',
+    en: { title: '', location: '', priceLabel: '', specs: [], description: '' },
+    fr: { title: '', location: '', priceLabel: '', specs: [], description: '' }
+  };
+  if (!prop) return;
+
+  const en = prop.en || {};
+  const fr = prop.fr || {};
+
+  document.getElementById('formTitle').innerHTML =
+    escapeHTML(isEdit ? t('edit_property') : t('add_property')) +
+    ' <span>' + escapeHTML(t('property_word')) + '</span>';
+
+  document.getElementById('fieldId').value = prop.id || '';
+  document.getElementById('fieldStatus').value = prop.status || 'for-rent';
+  document.getElementById('fieldType').value = prop.type || 'apartment';
+
+  document.getElementById('fieldTitleEn').value = en.title || '';
+  document.getElementById('fieldTitleFr').value = fr.title || '';
+  document.getElementById('fieldLocationEn').value = en.location || '';
+  document.getElementById('fieldLocationFr').value = fr.location || '';
+
+  document.getElementById('fieldRooms').value = prop.rooms != null ? prop.rooms : '';
+  document.getElementById('fieldArea').value = prop.area != null ? prop.area : '';
+  document.getElementById('fieldPrice').value = prop.price != null ? prop.price : '';
+  document.getElementById('fieldPriceUnit').value = prop.priceUnit || '';
+
+  document.getElementById('fieldPriceLabelEn').value = en.priceLabel || '';
+  document.getElementById('fieldPriceLabelFr').value = fr.priceLabel || '';
+  document.getElementById('fieldSpecsEn').value = (en.specs || []).join(', ');
+  document.getElementById('fieldSpecsFr').value = (fr.specs || []).join(', ');
+  document.getElementById('fieldDescEn').value = en.description || '';
+  document.getElementById('fieldDescFr').value = fr.description || '';
+
+  document.getElementById('fieldImages').value = (prop.images || []).join('\n');
+  document.getElementById('fieldGradient').value = prop.gradient || '';
+
+  formModal.classList.add('active');
+  formModal.setAttribute('aria-hidden', 'false');
+  document.getElementById('fieldTitleEn').focus();
+}
+
+function closeForm() {
+  formModal.classList.remove('active');
+  formModal.setAttribute('aria-hidden', 'true');
+}
+
+document.getElementById('formCancel').addEventListener('click', closeForm);
+formModal.addEventListener('click', (e) => {
+  if (e.target === formModal) closeForm();
+});
+
+document.getElementById('propForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const id = document.getElementById('fieldId').value.trim();
+  const titleEn = document.getElementById('fieldTitleEn').value.trim();
+  const titleFr = document.getElementById('fieldTitleFr').value.trim();
+  if (!titleEn && !titleFr) return showToast(t('title_required'));
+
+  const imagesText = document.getElementById('fieldImages').value.trim();
+  const imagesArr = imagesText ? imagesText.split('\n').map(l => l.trim()).filter(Boolean) : [];
+
+  const specsEnText = document.getElementById('fieldSpecsEn').value.trim();
+  const specsFrText = document.getElementById('fieldSpecsFr').value.trim();
+  const specsEnArr = specsEnText ? specsEnText.split(',').map(s => s.trim()).filter(Boolean) : [];
+  const specsFrArr = specsFrText ? specsFrText.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+  const rooms = document.getElementById('fieldRooms').value;
+  const area = document.getElementById('fieldArea').value;
+  const price = document.getElementById('fieldPrice').value;
+
+  const data = {
+    id: id || ('prop-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6)),
+    status: document.getElementById('fieldStatus').value,
+    type: document.getElementById('fieldType').value,
+    rooms: rooms === '' ? null : parseFloat(rooms),
+    area: area === '' ? null : parseInt(area, 10),
+    price: price === '' ? null : parseInt(price, 10),
+    priceUnit: document.getElementById('fieldPriceUnit').value.trim() || null,
+    images: imagesArr,
+    gradient: document.getElementById('fieldGradient').value.trim() || null,
+    en: {
+      title: titleEn || titleFr,
+      location: document.getElementById('fieldLocationEn').value.trim(),
+      priceLabel: document.getElementById('fieldPriceLabelEn').value.trim() || 'Price on request',
+      specs: specsEnArr,
+      description: document.getElementById('fieldDescEn').value.trim()
+    },
+    fr: {
+      title: titleFr || titleEn,
+      location: document.getElementById('fieldLocationFr').value.trim() || document.getElementById('fieldLocationEn').value.trim(),
+      priceLabel: document.getElementById('fieldPriceLabelFr').value.trim() || 'Prix sur demande',
+      specs: specsFrArr.length ? specsFrArr : specsEnArr,
+      description: document.getElementById('fieldDescFr').value.trim() || document.getElementById('fieldDescEn').value.trim()
+    }
+  };
+
+  const existingIdx = properties.findIndex(p => p.id === data.id);
+  if (existingIdx >= 0) {
+    properties[existingIdx] = data;
+  } else {
+    properties.unshift(data);
+  }
+  saveProperties();
+  renderAdminList();
+  renderGrid();
+  closeForm();
+  showToast(t('toast_saved'));
+});
+
+/* =========== SETTINGS =========== */
+document.getElementById('exportBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(properties, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'imwire-properties-' + new Date().toISOString().slice(0, 10) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(t('toast_exported'));
+});
+
+document.getElementById('importBtn').addEventListener('click', () => {
+  document.getElementById('importFile').click();
+});
+
+document.getElementById('importFile').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const parsed = JSON.parse(ev.target.result);
+      if (!Array.isArray(parsed)) throw new Error('Invalid format');
+      if (!confirm(t('confirm_delete').replace(/\?.*/, '?'))) {
+        // Use a simple replacement confirmation
+      }
+      properties = migrateProperties(parsed);
+      saveProperties();
+      renderAdminList();
+      renderGrid();
+      showToast(t('toast_imported'));
+    } catch (err) {
+      showToast(t('import_invalid'));
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if (!confirm(t('settings_danger_info'))) return;
+  properties = JSON.parse(JSON.stringify(DEFAULT_PROPERTIES));
+  saveProperties();
+  renderAdminList();
+  renderGrid();
+  showToast(t('toast_reset'));
+});
+
+document.getElementById('changePassBtn').addEventListener('click', () => {
+  const val = document.getElementById('newPassword').value.trim();
+  if (val.length < 4) return showToast(t('pw_too_short'));
+  localStorage.setItem(PASS_KEY, val);
+  document.getElementById('newPassword').value = '';
+  showToast(t('toast_pw_changed'));
+});
+
+document.getElementById('changeUserBtn').addEventListener('click', () => {
+  const val = document.getElementById('newUsername').value.trim();
+  if (val.length < 2) return showToast(t('user_too_short'));
+  localStorage.setItem(USER_KEY, val);
+  document.getElementById('newUsername').value = '';
+  const curUserEl = document.getElementById('currentUserEl');
+  if (curUserEl) curUserEl.textContent = val;
+  showToast(t('toast_user_changed'));
+});
+
+/* =========== ADMIN ACCESS =========== */
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('admin') === '1') {
+  setTimeout(openAdmin, 200);
+}
+
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+    e.preventDefault();
+    openAdmin();
+  }
+  if (e.key === 'Escape') {
+    if (loginModal.classList.contains('active')) closeLogin();
+    else if (formModal.classList.contains('active')) closeForm();
+    else if (adminDrawer.classList.contains('active')) closeAdmin();
+  }
+});
+
+/* =========== WIX HEIGHT REPORTING =========== */
+function reportHeight() {
+  try {
+    const h = document.documentElement.scrollHeight || document.body.scrollHeight;
+    window.parent.postMessage(JSON.stringify({ type: 'setHeight', height: h }), '*');
+  } catch (err) { /* ignore */ }
+}
+
+window.addEventListener('load', reportHeight);
+window.addEventListener('resize', debounce(reportHeight, 150));
+
+if ('ResizeObserver' in window) {
+  const ro = new ResizeObserver(debounce(reportHeight, 100));
+  ro.observe(document.body);
+}
+
+/* =========== INIT =========== */
+applyI18n();
+renderGrid();
+updateChipState();
+setTimeout(reportHeight, 300);
+setTimeout(reportHeight, 1200);
+</script>
+</body>
+</html>
