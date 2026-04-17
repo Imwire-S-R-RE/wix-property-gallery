@@ -148,6 +148,22 @@ body::before {
 .nav-links a:hover::after { width: 100%; }
 .nav-links a.active { color: var(--accent); }
 .nav-links a.active::after { width: 100%; }
+/* Highlighted nav link (e.g. Valuation) — white rounded pill */
+.nav-links a.nav-highlight,
+.mobile-menu a.nav-highlight {
+  color: var(--white);
+  border: 1px solid var(--white);
+  border-radius: 999px;
+  padding: 6px 14px;
+  transition: background .3s var(--ease-out), color .3s;
+}
+.nav-links a.nav-highlight:hover,
+.mobile-menu a.nav-highlight:hover {
+  background: var(--white);
+  color: var(--black);
+}
+.nav-links a.nav-highlight::after { display: none; }
+.mobile-menu a.nav-highlight { display: inline-block; }
 
 .nav-right { display: flex; align-items: center; gap: 20px; }
 .lang-switch {
@@ -1312,21 +1328,7 @@ img.loaded {
 <section class="hero">
   <div class="hero-content">
     <p class="label">Real Estate Agency &middot; Geneva &amp; Vaud</p>
-    <h1 class="hero-nav-h1">
-      <a href="#services">Services</a>
-      <span class="hero-sep">·</span>
-      <a href="/properties" target="_top">Properties</a>
-      <span class="hero-sep">·</span>
-      <a href="#estimation" class="hero-highlight">Valuation</a>
-      <span class="hero-sep">·</span>
-      <a href="#values">Values</a>
-      <span class="hero-sep">·</span>
-      <a href="#tools">Tools</a>
-      <span class="hero-sep">·</span>
-      <a href="/blog" target="_top">Blog</a>
-      <span class="hero-sep">·</span>
-      <a href="#contact">Contact</a>
-    </h1>
+    <h1>Real <em>estate</em></h1>
     <p class="subtitle">Rentals, sales and investment across Geneva and the canton of Vaud. IMWIRE supports you with transparency, objectivity and discretion in all your real estate projects.</p>
     <div class="hero-cta">
       <a href="/properties" target="_top" class="btn btn-primary btn-arrow">Discover Properties</a>
